@@ -25,7 +25,6 @@ func CreateStudentUser(username, password string) (*models.User, error) {
 	}
 
 	res := database.DB.Create(&user)
-
 	return user, res.Error
 }
 

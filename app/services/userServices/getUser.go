@@ -1,8 +1,6 @@
 package userServices
 
 import (
-	"crypto/sha256"
-	"encoding/hex"
 	"image-host/app/models"
 	"image-host/config/database"
 )
@@ -26,24 +24,6 @@ func GetUserID(id int) (*models.User, error) {
 	result := database.DB.Where(
 		&models.User{
 			ID: id,
-		},
-	).First(&user)
-	if result.Error != nil {
-		return nil, result.Error
-	}
-
-	return &user, nil
-}
-
-func GetUserByUsernameAndPassword(username, password string) (*models.User, error) {
-	h := sha256.New()
-	h.Write([]byte(password))
-	user := models.User{}
-	pass := hex.EncodeToString(h.Sum(nil))
-	result := database.DB.Where(
-		&models.User{
-			Username:   username,
-			JHPassword: pass,
 		},
 	).First(&user)
 	if result.Error != nil {
