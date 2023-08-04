@@ -1,10 +1,17 @@
 package models
 
+import (
+	"time"
+)
+
 type NameMap struct {
-	UUID          string `json:"uuid"`
-	Src           string `json:"src"`
-	Path          string `json:"path"`
-	Size          int64  `json:"size"`
-	Type          string `json:"type"`
-	DownloadCount int64  `json:"download_count"`
+	Id            int       `json:"id"`
+	UUID          string    `json:"uuid"`
+	Src           string    `json:"src"`
+	Size          int64     `json:"size"`
+	Type          string    `json:"type"`
+	DownloadCount int       `json:"download_count"`
+	CreatedAt     time.Time `json:"created_at"`
+	Temporary     bool      `json:"temporary"`
+	ExpireCount   int       `json:"expire_count"`
 }

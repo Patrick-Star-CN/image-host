@@ -1,4 +1,4 @@
-package userController
+package userControllers
 
 import (
 	"crypto/sha256"

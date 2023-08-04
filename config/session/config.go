@@ -12,7 +12,7 @@ const (
 	Redis  driver = "redis"
 )
 
-var defaultName = "wejh-session"
+var defaultName = "img-host-session"
 
 type sessionConfig struct {
 	Driver string

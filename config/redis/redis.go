@@ -9,17 +9,17 @@ type redisConfig struct {
 	Password string
 }
 
-var RedisClient *redis.Client
-var RedisInfo redisConfig
+var Client *redis.Client
+var Info redisConfig
 
 func init() {
 	info := getConfig()
 
-	RedisClient = redis.NewClient(&redis.Options{
+	Client = redis.NewClient(&redis.Options{
 		Addr:     info.Host + ":" + info.Port,
 		Password: info.Password,
 		DB:       info.DB,
 	})
-	RedisInfo = info
+	Info = info
 
 }

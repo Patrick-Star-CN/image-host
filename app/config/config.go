@@ -11,7 +11,7 @@ import (
 var ctx = context.Background()
 
 func getConfig(key string) string {
-	val, err := redis.RedisClient.Get(ctx, key).Result()
+	val, err := redis.Client.Get(ctx, key).Result()
 	if err == nil {
 		return val
 	}
@@ -22,12 +22,12 @@ func getConfig(key string) string {
 			Key: key,
 		}).First(&config)
 
-	redis.RedisClient.Set(ctx, key, config.Value, 0)
+	redis.Client.Set(ctx, key, config.Value, 0)
 	return config.Value
 }
 
 func setConfig(key, value string) error {
-	redis.RedisClient.Set(ctx, key, value, 0)
+	redis.Client.Set(ctx, key, value, 0)
 	res := database.DB.Model(models.Config{}).Where(
 		&models.Config{
 			Key: key,
@@ -47,7 +47,7 @@ func setConfig(key, value string) error {
 }
 
 func checkConfig(key string) bool {
-	intCmd := redis.RedisClient.Exists(ctx, key)
+	intCmd := redis.Client.Exists(ctx, key)
 	if intCmd.Val() == 1 {
 		return true
 	} else {
@@ -56,7 +56,7 @@ func checkConfig(key string) bool {
 }
 
 func delConfig(key string) error {
-	redis.RedisClient.Del(ctx, key)
+	redis.Client.Del(ctx, key)
 	res := database.DB.Where(&models.Config{
 		Key: key,
 	}).Delete(models.Config{})
