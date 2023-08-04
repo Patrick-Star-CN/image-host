@@ -28,7 +28,7 @@ func fileRouterInit(r *gin.RouterGroup) {
 
 		imgFun.GET("/list/:page", fileControllers.GetImgList)
 
-		fileFun.DELETE("/:file_name", fileControllers.DeleteFile)
+		imgFun.DELETE("/:file_name", fileControllers.DeleteFile)
 	}
 
 	webpUrlKeyFun := r.Group("/key", midwares.CheckLogin)
