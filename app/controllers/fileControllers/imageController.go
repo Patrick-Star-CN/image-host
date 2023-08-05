@@ -24,6 +24,7 @@ import (
 // UploadImg 上传图片
 func UploadImg(c *gin.Context) {
 	// 存储文件
+	isTransparent := c.Query("isTransparent")
 	form, _ := c.MultipartForm()
 	img := form.File["img"][0]
 	imgName := img.Filename
@@ -35,6 +36,11 @@ func UploadImg(c *gin.Context) {
 	_, _ = file.Read(buffer)
 	contentType := http.DetectContentType(buffer)
 	_ = file.Close()
+	if contentType != "image/png" && contentType != "image/jpeg" {
+		_ = os.Remove("./tmp/" + imgName)
+		_ = c.AbortWithError(200, apiException.ImgTypeError)
+		return
+	}
 
 	// 重启文件并转换类型
 	file, _ = os.Open("./tmp/" + imgName)
@@ -42,7 +48,7 @@ func UploadImg(c *gin.Context) {
 		_ = file.Close()
 	}(file)
 	imgPrefix := strings.TrimSuffix(img.Filename, path.Ext(imgName))
-	if contentType == "image/png" {
+	if contentType == "image/png" && isTransparent == "false" {
 		// 为了处理一些仅修改了后缀而并未重新编码的图片，所有 png 文件都改为正确后缀
 		newTypeName := "./tmp/" + imgPrefix + ".png"
 		_ = os.Rename("./tmp/"+imgName, newTypeName)
@@ -74,35 +80,52 @@ func UploadImg(c *gin.Context) {
 		_ = file.Close()
 		file, _ = os.Open("./tmp/" + imgName)
 	}
+	fileName := uuid.NewString()
 
-	// jpg2webp
-	imgNew, err := jpeg.Decode(file)
-	if err != nil {
-		fmt.Println(err)
-		_ = c.AbortWithError(200, apiException.ImgTypeError)
-		return
+	var imgType string
+	if isTransparent == "true" {
+		// 处理透明图片
+		if contentType == "image/jpeg" {
+			_ = c.AbortWithError(200, apiException.ImgTypeError)
+			return
+		}
+		fileName += ".png"
+		imgPrefix += ".png"
+		imgType = "image/png"
+		_ = os.Rename("./tmp/"+imgName, "./img/"+fileName)
+	} else {
+		// jpg2webp
+		fileName += ".webp"
+		imgPrefix += ".webp"
+		imgType = "image/webp"
+		imgNew, err := jpeg.Decode(file)
+		if err != nil {
+			fmt.Println(err)
+			_ = c.AbortWithError(200, apiException.ImgTypeError)
+			return
+		}
+		output, _ := os.Create("./img/" + fileName)
+		defer func(output *os.File) {
+			_ = output.Close()
+		}(output)
+		options, err := encoder.NewLossyEncoderOptions(encoder.PresetDefault, 75)
+		if err != nil {
+			_ = c.AbortWithError(200, apiException.ImgTypeError)
+			return
+		}
+		err = webp.Encode(output, imgNew, options)
+		if err != nil {
+			_ = c.AbortWithError(200, apiException.ImgTypeError)
+			return
+		}
+		_ = os.Remove("./tmp/" + imgName)
 	}
-	fileName := uuid.NewString() + ".webp"
-	output, _ := os.Create("./img/" + fileName)
-	defer func(output *os.File) {
-		_ = output.Close()
-	}(output)
-	options, err := encoder.NewLossyEncoderOptions(encoder.PresetDefault, 75)
-	if err != nil {
-		_ = c.AbortWithError(200, apiException.ImgTypeError)
-		return
-	}
-	err = webp.Encode(output, imgNew, options)
-	if err != nil {
-		_ = c.AbortWithError(200, apiException.ImgTypeError)
-		return
-	}
-	_ = os.Remove("./tmp/" + imgName)
+
 	fileInfo, err := os.Stat("./img/" + fileName)
 	err = nameMapServices.Insert(models.NameMap{
-		Src:         imgPrefix + ".webp",
+		Src:         imgPrefix,
 		UUID:        fileName,
-		Type:        "image/webp",
+		Type:        imgType,
 		Size:        fileInfo.Size(),
 		Temporary:   false,
 		ExpireCount: -1,
