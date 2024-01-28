@@ -8,11 +8,8 @@ import (
 func userRouterInit(r *gin.RouterGroup) {
 	user := r.Group("/user")
 	{
-		user.POST("/create/student/wechat", userControllers.BindOrCreateStudentUserFromWechat)
-		user.POST("/create/student", userControllers.CreateStudentUser)
+		user.POST("/create", userControllers.CreateUser)
 
-		user.POST("/login/wechat", userControllers.WeChatLogin)
 		user.POST("/login", userControllers.AuthByPassword)
-		user.POST("/login/session", userControllers.AuthBySession)
 	}
 }

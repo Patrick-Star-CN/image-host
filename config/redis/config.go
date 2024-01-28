@@ -9,17 +9,17 @@ func getConfig() redisConfig {
 		DB:       0,
 		Password: "",
 	}
-	if config.Config.IsSet("redis.host") {
-		Info.Host = config.Config.GetString("redis.host")
+	if config.Config.Redis.Host != "" {
+		Info.Host = config.Config.Redis.Host
 	}
-	if config.Config.IsSet("redis.port") {
-		Info.Port = config.Config.GetString("redis.port")
+	if config.Config.Redis.Port != "" {
+		Info.Port = config.Config.Redis.Port
 	}
-	if config.Config.IsSet("redis.db") {
-		Info.DB = config.Config.GetInt("redis.db")
+	if config.Config.Redis.DB != 0 {
+		Info.DB = config.Config.Redis.DB
 	}
-	if config.Config.IsSet("redis.password") {
-		Info.DB = config.Config.GetInt("redis.password")
+	if config.Config.Redis.Pass != "" {
+		Info.Password = config.Config.Redis.Pass
 	}
 	return Info
 }

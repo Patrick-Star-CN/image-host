@@ -3,10 +3,9 @@ package userControllers
 import (
 	"crypto/sha256"
 	"image-host/app/apiException"
-	"image-host/app/services/sessionServices"
 	"image-host/app/services/userServices"
 	"image-host/app/utils"
-	"image-host/config/wechat"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -43,48 +42,8 @@ func AuthByPassword(c *gin.Context) {
 	h := sha256.New()
 	h.Write([]byte(postForm.Password))
 
-	err = sessionServices.SetUserSession(c, user)
-	if err != nil {
-		_ = c.AbortWithError(200, apiException.ServerError)
-		return
-	}
-	utils.JsonSuccessResponse(c, nil)
-
-}
-
-func AuthBySession(c *gin.Context) {
-	_, err := sessionServices.UpdateUserSession(c)
-	if err != nil {
-		_ = c.AbortWithError(200, apiException.ServerError)
-		return
-	}
-	utils.JsonSuccessResponse(c, nil)
-}
-
-func WeChatLogin(c *gin.Context) {
-	var postForm autoLoginForm
-	err := c.ShouldBindJSON(&postForm)
-	if err != nil {
-		_ = c.AbortWithError(200, apiException.ParamError)
-		return
-	}
-
-	session, err := wechat.MiniProgram.GetAuth().Code2Session(postForm.Code)
-	if err != nil {
-		_ = c.AbortWithError(200, apiException.OpenIDError)
-		return
-	}
-
-	user := userServices.GetUserByWechatOpenID(session.OpenID)
-	if user == nil {
-		_ = c.AbortWithError(200, apiException.UserNotFind)
-		return
-	}
-
-	err = sessionServices.SetUserSession(c, user)
-	if err != nil {
-		_ = c.AbortWithError(200, apiException.ServerError)
-		return
-	}
-	utils.JsonSuccessResponse(c, nil)
+	token := utils.GenerateStandardJwt(&utils.JwtData{
+		ID: strconv.Itoa(user.ID),
+	})
+	utils.JsonSuccessResponse(c, gin.H{"token": token})
 }

@@ -4,23 +4,26 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"image-host/app/midwares"
+	"image-host/config/config"
 	"image-host/config/database"
 	"image-host/config/router"
-	"image-host/config/session"
 	"log"
 )
 
 func main() {
+	config.Init()
 	database.Init()
 	r := gin.Default()
-	r.Use(cors.Default())
+	corsConfig := cors.DefaultConfig()
+	corsConfig.AllowHeaders = append(corsConfig.AllowHeaders, "Authorization")
+	corsConfig.AllowAllOrigins = true
+	r.Use(cors.New(corsConfig))
 	r.Use(midwares.ErrHandler())
 	r.NoMethod(midwares.HandleNotFound)
 	r.NoRoute(midwares.HandleNotFound)
-	session.Init(r)
 	router.Init(r)
 
-	err := r.Run(":8088")
+	err := r.Run(":" + config.Config.Server.Port)
 	if err != nil {
 		log.Fatal("ServerStartFailed", err)
 	}

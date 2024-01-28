@@ -18,3 +18,7 @@ func GetPathKey() string {
 func SetPathKey(url string) error {
 	return setConfig(pathKey, url)
 }
+
+func DelPathKey() error {
+	return delConfig(pathKey)
+}
