@@ -5,16 +5,8 @@ redis:
   user: root
   pass:
 
-wechat: # 微信小程序相关配置 (切记不能泄漏）
-  appid:
-  appsecret:
-
-dev: true
-
 server:
   port: "8088"
-  allow_origins:
-    - "http://localhost:3000"
 
 db:
   user_name: "root"

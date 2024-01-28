@@ -45,5 +45,11 @@ func Init() {
 	err := config.ReadInConfig()
 	if err != nil {
 		log.Fatal("Config not find", err)
+		return
+	}
+	err = config.Unmarshal(&Config)
+	if err != nil {
+		log.Fatal("Config error", err)
+		return
 	}
 }
