@@ -3,6 +3,7 @@ module image-host
 go 1.15
 
 require (
+	github.com/chai2010/webp v1.1.1 // indirect
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/gin-contrib/cors v1.3.1
 	github.com/gin-contrib/sessions v0.0.3

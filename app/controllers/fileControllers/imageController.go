@@ -24,7 +24,7 @@ import (
 // UploadImg 上传图片
 func UploadImg(c *gin.Context) {
 	// 存储文件
-	isTransparent := c.Query("isTransparent")
+	isTransparent := c.Query("is_transparent")
 	form, _ := c.MultipartForm()
 	img := form.File["img"][0]
 	imgName := img.Filename

@@ -12,13 +12,13 @@ func fileRouterInit(r *gin.RouterGroup) {
 	{
 		fileFun.POST("/upload", fileControllers.UploadFile)
 
-		fileFun.GET("/download/:file_name", fileControllers.GetFile)
-
 		fileFun.GET("/list/:page", fileControllers.GetFileList)
 
 		fileFun.DELETE("/:file_name", fileControllers.DeleteFile)
 
 	}
+
+	r.GET("/file/download/:file_name", fileControllers.GetFile)
 
 	imgFun := r.Group("/img", midwares.CheckLogin)
 	{

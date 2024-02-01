@@ -15,7 +15,7 @@ func main() {
 	database.Init()
 	r := gin.Default()
 	corsConfig := cors.DefaultConfig()
-	corsConfig.AllowHeaders = append(corsConfig.AllowHeaders, "Authorization")
+	corsConfig.AllowHeaders = append(corsConfig.AllowHeaders, "Authorization", "Content-Type")
 	corsConfig.AllowAllOrigins = true
 	r.Use(cors.New(corsConfig))
 	r.Use(midwares.ErrHandler())
