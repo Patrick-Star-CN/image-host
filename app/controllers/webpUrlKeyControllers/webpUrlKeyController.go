@@ -9,7 +9,7 @@ import (
 // SubmitKey 上传路径 key
 func SubmitKey(c *gin.Context) {
 	key := c.Query("key")
-	err := config.SetPathKey(key)
+	err := config.SetWebpUrlKey(key)
 	if err != nil {
 		return
 	}
@@ -18,13 +18,13 @@ func SubmitKey(c *gin.Context) {
 
 // GetKey 获取路径 key
 func GetKey(c *gin.Context) {
-	key := config.GetPathKey()
+	key := config.GetWebpUrlKey()
 	utils.JsonSuccessResponse(c, key)
 }
 
 // DeleteKey 删除路径 key
 func DeleteKey(c *gin.Context) {
-	err := config.DelPathKey()
+	err := config.DelWebpUrlKey()
 	if err != nil {
 		return
 	}
