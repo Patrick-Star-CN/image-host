@@ -1,6 +1,7 @@
 package nameMapServices
 
 import (
+	"fmt"
 	"gorm.io/gorm"
 	"image-host/app/models"
 	"image-host/config/database"
@@ -12,11 +13,10 @@ func Insert(nameMap models.NameMap) error {
 }
 
 func QueryByUUID(uuid string) (models.NameMap, error) {
+	fmt.Println(uuid)
 	nameMap := models.NameMap{}
 	result := database.DB.Where(
-		&models.NameMap{
-			UUID: uuid,
-		},
+		map[string]interface{}{"UUID": uuid},
 	).First(&nameMap)
 	if result.Error != nil {
 		return models.NameMap{}, result.Error
@@ -52,9 +52,9 @@ func QueryImgList(page int) ([]models.NameMap, int64, error) {
 	return nameMap, count, nil
 }
 
-func Delete(uuid string) error {
+func Delete(id int) error {
 	result := database.DB.Delete(models.NameMap{
-		UUID: uuid,
+		Id: id,
 	})
 	return result.Error
 }

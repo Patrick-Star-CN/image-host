@@ -29,7 +29,11 @@ func GetFile(c *gin.Context) {
 		c.FileAttachment("./public/"+file.UUID, file.Src)
 	}
 	if file.Temporary && file.ExpireCount == file.DownloadCount+1 {
-		_ = nameMapServices.Delete(file.UUID)
+		err := DeleteFileImpl(file.UUID)
+		if err != nil {
+			_ = c.AbortWithError(200, apiException.ServerError)
+			return
+		}
 	} else if err := nameMapServices.FileDownloadCountIncrement(file.Src); err != nil {
 		log.Println(err)
 		return
@@ -71,10 +75,18 @@ func UploadFile(c *gin.Context) {
 // DeleteFile 删除文件
 func DeleteFile(c *gin.Context) {
 	uuidName, _ := url.QueryUnescape(c.Param("file_name"))
-	file, err := nameMapServices.QueryByUUID(uuidName)
+	err := DeleteFileImpl(uuidName)
 	if err != nil {
 		_ = c.AbortWithError(200, apiException.ServerError)
 		return
+	}
+	utils.JsonSuccessResponse(c, nil)
+}
+
+func DeleteFileImpl(uuidName string) error {
+	file, err := nameMapServices.QueryByUUID(uuidName)
+	if err != nil {
+		return err
 	}
 	// 删除一个路径为file.uuid的文件
 	if strings.HasPrefix(file.Type, "image") {
@@ -82,12 +94,11 @@ func DeleteFile(c *gin.Context) {
 	} else {
 		_ = os.Remove("./public/" + file.UUID)
 	}
-	err = nameMapServices.Delete(uuidName)
+	err = nameMapServices.Delete(file.Id)
 	if err != nil {
-		_ = c.AbortWithError(200, apiException.ServerError)
-		return
+		return err
 	}
-	utils.JsonSuccessResponse(c, nil)
+	return nil
 }
 
 // GetFileList 获取文件列表
